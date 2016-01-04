@@ -1,0 +1,6 @@
+#python:
+*.py[cod]
+
+#IDE file
+.idea
+
