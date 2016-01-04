@@ -66,7 +66,7 @@ MachineLearning
 ##[7. Others](./MachineLearning/7.Others/)
 
 
-##[8. Documents](./MachineLearning/8. Documents/)
+##[8. Documents](./MachineLearning/8.Documents/)
 
 
 
