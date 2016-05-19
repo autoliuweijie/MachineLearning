@@ -274,12 +274,75 @@ class HMM:
 
         print "finished train successfully! the hmm is:"
         self.printhmm()
+    
+    def new_train(self, I, O, num_state, num_obserivation, init_observation=-1, init_state=-1):
+        """
+        function: training HMM
+        :param I: state list like I = [[0,1,2,0],[1,0,1],[1,2,0],]
+        :param O: observation list like O =     O = np.array([[0,1,1,1],[1,0,1],[1,1,0],])
+        :param num_state: the number of state, lke 3
+        :param num_obserivation: the number of observation, like 2
+        :param init_observation: the index of init observation, like 1
+        :param init_state: the index of init starw, like 2
+        """
+
+        print "statr training HMM..."
+        self.N = num_state
+        self.M = num_obserivation
+
+        # count num_A[i,j] standing for the numbers of state i translating to state j
+        num_A = np.zeros((num_state, num_state), np.float)
+        for i in range(self.N):
+            for j in range(self.N):
+                num_i2j = 0
+                for i_I in range(len(I)):
+                    for j_I in range(len(I[i_I]) - 1):
+                            if I[i_I][j_I] == i and I[i_I][j_I + 1] == j:
+                                num_i2j += 1
+                num_A[i, j] = num_i2j
+
+        # count num_B[i,j] standing for the numbers of state i translating to obsrtvation j
+        num_B = np.zeros((num_state, num_obserivation), np.float)
+        for i in range(self.N):
+            for j in range(self.M):
+                num_i2j = 0
+                for i_I in range(len(I)):
+                    for j_I in range(len(I[i_I])):
+                        if I[i_I][j_I] == i and O[i_I][j_I] == j:
+                            num_i2j += 1
+                num_B[i, j] = num_i2j
+
+        self.A = num_A / np.sum(np.mat(num_A), axis=1).A
+        self.B = num_B / np.sum(np.mat(num_B), axis=1).A
+
+        # calculate pi according init_observation or init_state
+        if init_state != -1:
+            print "init pi with init_state!"
+            pi_temp = np.zeros((self.N,), np.float)
+            pi_temp[init_state] = 1.0
+            self.pi = pi_temp
+        elif init_observation != -1:
+            print "init pi with init_observation!"
+            self.pi = self.B[:, init_observation] / np.sum(self.B[:, init_observation])
+        else:
+            print "init pi with state list I!"
+            self.pi = np.zeros((self.N,), np.float)
+            for i in range(self.N):
+                num_state_i = 0
+                for line in I:
+                    if line[0] == i:
+                        num_state_i += 1
+                self.pi[i] = num_state_i
+            self.pi = self.pi/np.sum(self.pi, axis=0)
+
+        print "finished train successfully! the hmm is:"
+        # self.printhmm()
 
 
 
 
 if __name__ == "__main__":
-    # 已知hmm模型, 用来预测
+    # hmm, 
     print "python my HMM"
     A = np.array([
         [0.5, 0.2, 0.3],
@@ -298,7 +361,7 @@ if __name__ == "__main__":
     print hmm.viterbi(O1)
     print hmm.forward(O1)
 
-    # 已知观测序列与对应的状态序列, 训练得到hmm模型
+    # , hmm
     I = np.array([
         [0,1,2],
         [1,0,1],
@@ -310,8 +373,8 @@ if __name__ == "__main__":
         [1,1,0],
     ])
     hmm2 = HMM()
-    hmm2.train(I, O, 3, 2)  # 未知初始状态或观测值
-    hmm2.train(I, O, 3, 2, init_observation=0)  # 已知初开始观测值
-    hmm2.train(I, O, 3, 2, init_state=0)  # 已知初始状态
+    hmm2.train(I, O, 3, 2)  # 
+    hmm2.train(I, O, 3, 2, init_observation=0)  # 
+    hmm2.train(I, O, 3, 2, init_state=0)  # 
 
 
